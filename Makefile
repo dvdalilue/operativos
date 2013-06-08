@@ -6,8 +6,8 @@
 CC = gcc
 OPS = -ggdb -O3
 MAIN = main.c
-DEPS = lista.h
-OBJS = lista.o main.o
+DEPS = 
+OBJS = main.o
 
 frecpal: $(OBJS)
 	$(CC) $(OPS) $(MAIN) -o $@ 
