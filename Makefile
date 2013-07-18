@@ -6,10 +6,10 @@
 CC = gcc
 OPS = -ggdb -O3
 MAIN = main.c
-DEPS = 
-OBJS = main.o
+DEPS = funciones.h
+OBJS = funciones.o main.o
 
-frecpal: $(OBJS)
+juegodedados_p: $(OBJS)
 	$(CC) $(OPS) $(MAIN) -o $@ 
 
 %.o: %.c $(DEPS)
@@ -19,5 +19,5 @@ check-syntax:
 	$(CC) -o nul -S ${CHK_SOURCES}
 
 clean:
-	\rm -f *.o *.out frecpal nul
+	\rm -f *.o *.out *.txt juegodedados_p nul
 
