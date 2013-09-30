@@ -6,8 +6,10 @@
 
 int main (int argc, char *argv[]) {
   
-  int i = 1;
+  int i = 1, j;
   bool b = false;
+  char input[200] = "";
+  char act_input;
 
   while (i < argc) {
     if (strcmp(argv[i], "-r") == 0) {
@@ -19,5 +21,18 @@ int main (int argc, char *argv[]) {
     }
     i+=1;
   }
-  desDir(argv[i],0);
+
+  printf("Introduzca nombre del directorio: ");
+
+  j = 0;
+  while (j < 200) {
+    act_input = getchar();
+    if(act_input != '\n') {
+      input[j] = act_input;
+    } else {
+      break;
+    }
+    j++;
+  }
+  desDir(input,0,argv[i],b);
 }
