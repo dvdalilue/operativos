@@ -19,5 +19,5 @@ int main (int argc, char *argv[]) {
     }
     i+=1;
   }
-  desdir(argv[i],0);
+  desDir(argv[i],0);
 }

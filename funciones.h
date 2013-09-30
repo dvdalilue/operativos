@@ -1,8 +1,8 @@
 #ifndef funciones
 #define funciones
 
+void impDir(char *dir, int i, int j, int nivel);
 void impEsp(int nivel);
-void desdir(char *dir, int nivel);
-void buscadir();
+void desDir(char *dir, int nivel);
 
 #endif

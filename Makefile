@@ -5,11 +5,11 @@
 
 CC = gcc
 MAIN = main.c
-DEPS = funciones.h
-OBJS = funciones.o main.o
+DEPS = funciones.h queue.h
+OBJS = funciones.o queue.o main.o
 
 arbol: $(OBJS)
-	$(CC) $(MAIN) -o $@ 
+	$(CC) -ggdb $(MAIN) -o $@ 
 
 %.o: %.c $(DEPS)
 	$(CC) -c $<
