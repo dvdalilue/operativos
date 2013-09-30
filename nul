@@ -1,0 +1,194 @@
+	.file	"funciones_flymake.c"
+	.section	.rodata
+.LC0:
+	.string	"  "
+	.text
+	.globl	impEsp
+	.type	impEsp, @function
+impEsp:
+.LFB0:
+	.cfi_startproc
+	pushq	%rbp
+	.cfi_def_cfa_offset 16
+	.cfi_offset 6, -16
+	movq	%rsp, %rbp
+	.cfi_def_cfa_register 6
+	subq	$32, %rsp
+	movl	%edi, -20(%rbp)
+	movl	$0, -4(%rbp)
+	jmp	.L2
+.L3:
+	movl	$.LC0, %edi
+	movl	$0, %eax
+	call	printf
+	addl	$1, -4(%rbp)
+.L2:
+	movl	-4(%rbp), %eax
+	cmpl	-20(%rbp), %eax
+	jl	.L3
+	leave
+	.cfi_def_cfa 7, 8
+	ret
+	.cfi_endproc
+.LFE0:
+	.size	impEsp, .-impEsp
+	.section	.rodata
+	.align 8
+.LC1:
+	.string	"*No puedo abrir el directorio!!"
+.LC2:
+	.string	"."
+.LC3:
+	.string	".."
+.LC4:
+	.string	"Directorio: %s\n"
+	.align 8
+.LC5:
+	.string	"Numero de archivos normales: %d\n"
+.LC6:
+	.string	"Numero de directorios: %d\n"
+	.text
+	.globl	desdir
+	.type	desdir, @function
+desdir:
+.LFB1:
+	.cfi_startproc
+	pushq	%rbp
+	.cfi_def_cfa_offset 16
+	.cfi_offset 6, -16
+	movq	%rsp, %rbp
+	.cfi_def_cfa_register 6
+	subq	$80, %rsp
+	movq	%rdi, -56(%rbp)
+	movl	%esi, -60(%rbp)
+	movb	$4, -9(%rbp)
+	movl	$0, -4(%rbp)
+	movl	$0, -8(%rbp)
+	movq	-56(%rbp), %rax
+	movq	%rax, %rdi
+	call	opendir
+	movq	%rax, -24(%rbp)
+	cmpq	$0, -24(%rbp)
+	jne	.L7
+	movl	$.LC1, %edi
+	call	perror
+	jmp	.L4
+.L9:
+	movq	-32(%rbp), %rax
+	movzbl	18(%rax), %eax
+	movzbl	%al, %edx
+	movsbl	-9(%rbp), %eax
+	cmpl	%eax, %edx
+	jne	.L8
+	movq	-32(%rbp), %rax
+	addq	$19, %rax
+	movl	$.LC2, %esi
+	movq	%rax, %rdi
+	call	strcmp
+	testl	%eax, %eax
+	je	.L7
+	movq	-32(%rbp), %rax
+	addq	$19, %rax
+	movl	$.LC3, %esi
+	movq	%rax, %rdi
+	call	strcmp
+	testl	%eax, %eax
+	je	.L7
+	movl	$78, %edi
+	call	malloc
+	movq	%rax, -40(%rbp)
+	movq	-56(%rbp), %rdx
+	movq	-40(%rbp), %rax
+	movq	%rdx, %rsi
+	movq	%rax, %rdi
+	call	strcpy
+	movq	-32(%rbp), %rax
+	leaq	19(%rax), %rdx
+	movq	-40(%rbp), %rax
+	movq	%rdx, %rsi
+	movq	%rax, %rdi
+	call	strcat
+	movq	-40(%rbp), %rax
+	movq	$-1, -72(%rbp)
+	movq	%rax, %rdx
+	movl	$0, %eax
+	movq	-72(%rbp), %rcx
+	movq	%rdx, %rdi
+	repnz scasb
+	movq	%rcx, %rax
+	notq	%rax
+	leaq	-1(%rax), %rdx
+	movq	-40(%rbp), %rax
+	addq	%rdx, %rax
+	movw	$47, (%rax)
+	movl	-60(%rbp), %eax
+	leal	1(%rax), %edx
+	movq	-40(%rbp), %rax
+	movl	%edx, %esi
+	movq	%rax, %rdi
+	call	desdir
+	movq	-40(%rbp), %rax
+	movq	%rax, %rdi
+	call	free
+	addl	$1, -8(%rbp)
+	jmp	.L7
+.L8:
+	addl	$1, -4(%rbp)
+.L7:
+	movq	-24(%rbp), %rax
+	movq	%rax, %rdi
+	call	readdir
+	movq	%rax, -32(%rbp)
+	cmpq	$0, -32(%rbp)
+	jne	.L9
+	movl	-60(%rbp), %eax
+	movl	%eax, %edi
+	call	impEsp
+	movq	-56(%rbp), %rax
+	movq	%rax, %rsi
+	movl	$.LC4, %edi
+	movl	$0, %eax
+	call	printf
+	movl	-60(%rbp), %eax
+	movl	%eax, %edi
+	call	impEsp
+	movl	-4(%rbp), %eax
+	movl	%eax, %esi
+	movl	$.LC5, %edi
+	movl	$0, %eax
+	call	printf
+	movl	-60(%rbp), %eax
+	movl	%eax, %edi
+	call	impEsp
+	movl	-8(%rbp), %eax
+	movl	%eax, %esi
+	movl	$.LC6, %edi
+	movl	$0, %eax
+	call	printf
+.L4:
+	leave
+	.cfi_def_cfa 7, 8
+	ret
+	.cfi_endproc
+.LFE1:
+	.size	desdir, .-desdir
+	.globl	buscadir
+	.type	buscadir, @function
+buscadir:
+.LFB2:
+	.cfi_startproc
+	pushq	%rbp
+	.cfi_def_cfa_offset 16
+	.cfi_offset 6, -16
+	movq	%rsp, %rbp
+	.cfi_def_cfa_register 6
+	movl	$10, %edi
+	call	putchar
+	popq	%rbp
+	.cfi_def_cfa 7, 8
+	ret
+	.cfi_endproc
+.LFE2:
+	.size	buscadir, .-buscadir
+	.ident	"GCC: (Debian 4.7.2-5) 4.7.2"
+	.section	.note.GNU-stack,"",@progbits
