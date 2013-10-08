@@ -3,6 +3,6 @@
 
 void impDir(char *dir, int i, int j, int nivel);
 void impEsp(int nivel);
-void desDir(char *dir, int nivel, char *salida, bool b);
+void desDir(char *dir, int nivel, char *salida, bool b, int *dirs, int *archs);
 
 #endif

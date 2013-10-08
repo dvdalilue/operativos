@@ -30,7 +30,7 @@ void impDir(char *dir, int i, int j, int nivel) {
   printf("Numero de directorios: %d\n",j);
 }
 
-void desDir(char *dir, int nivel, char *salida, bool b) {
+void desDir(char *dir, int nivel, char *salida, bool b, int *dirs, int *archs) {
   
   DIR *aux;
   char esDir = 0x4, *aux_dir;
@@ -59,9 +59,12 @@ void desDir(char *dir, int nivel, char *salida, bool b) {
     }
     closedir(aux);
     impDir(dir,i,j,nivel);
+    *dirs+=j;
+    *archs+=i;
+
     while (!estaVacio(cola)) {
       aux_dir = desencolar(cola);
-      desDir(aux_dir,nivel+1,salida,b);
+      desDir(aux_dir,nivel+1,salida,b,dirs,archs);
       free(aux_dir);
     }
     cola_finic(&cola);
