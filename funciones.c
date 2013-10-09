@@ -59,8 +59,8 @@ void desDir(char *dir, int nivel, char *salida, bool b, int *dirs, int *archs) {
     }
     closedir(aux);
     impDir(dir,i,j,nivel);
-    *dirs+=j;
-    *archs+=i;
+    *dirs = *dirs + j;
+    *archs = *archs + i;
 
     while (!estaVacio(cola)) {
       aux_dir = desencolar(cola);

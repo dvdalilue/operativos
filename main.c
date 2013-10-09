@@ -8,7 +8,18 @@
 int counter = 0;
 
 void manejador_signal(int sig) {
-  printf("Se ha habilitado la interrupción con SIGINT");
+  if (counter == 0) {
+    printf("\n\nSe ha habilitado la interrupción con SIGINT\n");
+    fflush(stdout);
+  }
+  if (counter == 1) {
+    time_t tiempo = time(0);
+    struct tm *tlocal = localtime(&tiempo);
+    char output[128];
+    strftime(output,128,"%I:%M%p del %d de %B de %Y",tlocal);
+    printf("\narbol: termina al recibir dos SIGINT, a las %s\n\n",output);
+    exit(0);
+  }
   counter++;
 }
 
@@ -27,10 +38,12 @@ void numDir(char *input, int i, int j) {
 
 int main (int argc, char *argv[]) {
   
-  int i = 1, j, dirs = 0, archs = 0;
+  int i = 1, j, dirs, archs;
   bool b = false;
   char input[200] = "";
   char act_input;
+
+  signal(SIGINT, &manejador_signal);
 
   while (i < argc) {
     if (strcmp(argv[i], "-r") == 0) {
@@ -46,11 +59,11 @@ int main (int argc, char *argv[]) {
   while (counter < 1) {
 
     printf("\nIntroduzca nombre del directorio: ");
-
-    signal(SIGINT, manejador_signal);
+    dirs = 0;
+    archs = 0;
 
     j = 0;
-    while (j < 200) {
+    while (j < 200 && counter == 0) {
       act_input = getchar();
       if(act_input != '\n') {
 	input[j] = act_input;
@@ -59,9 +72,11 @@ int main (int argc, char *argv[]) {
       }
       j++;
     }
+    if (counter == 0) {
     desDir(input,0,argv[i],b,&dirs,&archs);
-    numDir(input,i,j);
+    numDir(input,archs,dirs);
     clean_array(input);
+    }
   }
 
   while (counter < 2) {
