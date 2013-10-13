@@ -21,7 +21,27 @@ void impEsp(int nivel) {
   }
 }
 
-void impDir(char *dir, int i, int j, int nivel) {
+void impEspFile(int nivel, FILE *fp) {
+  int i = 0;
+  while (i < nivel) {
+    fprintf(fp, "  ");
+    i++;
+  }
+}
+
+void impDir(char *dir, int i, int j, int nivel, char *salida) {
+  FILE *fp;
+
+  fp=fopen(salida, "a");
+  impEspFile(nivel, fp);
+  fprintf(fp, "Directorio: %s\n",dir);
+  impEspFile(nivel, fp);
+  fprintf(fp, "Numero de archivos normales: %d\n",i);
+  impEspFile(nivel, fp);
+  fprintf(fp, "Numero de directorios: %d\n",j);
+
+  fclose(fp);
+
   impEsp(nivel);
   printf("Directorio: %s\n",dir);
   impEsp(nivel);
@@ -52,13 +72,13 @@ void desDir(char *dir, int nivel, char *salida, bool b, int *dirs, int *archs) {
 	  strcat(aux_dir,"/");
 	  encolar(cola,aux_dir);
 	  j++;
-	}
+	} 
       } else {
 	i++;
       }
     }
     closedir(aux);
-    impDir(dir,i,j,nivel);
+    impDir(dir,i,j,nivel,salida);
     *dirs = *dirs + j;
     *archs = *archs + i;
 

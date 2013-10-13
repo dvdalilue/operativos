@@ -10,6 +10,7 @@ int counter = 0;
 void manejador_signal(int sig) {
   if (counter == 0) {
     printf("\n\nSe ha habilitado la interrupción con SIGINT\n");
+    printf("\nIntroduzca nombre del directorio: ");
     fflush(stdout);
   }
   if (counter == 1) {
@@ -21,6 +22,17 @@ void manejador_signal(int sig) {
     exit(0);
   }
   counter++;
+}
+
+bool file_exists(char * filename) {
+
+  FILE * file;
+  if (file = fopen(filename, "r")) {
+    fclose(file);
+    return true;
+  } else {
+    return false;
+  }
 }
 
 void clean_array(char *input) {
@@ -51,19 +63,24 @@ int main (int argc, char *argv[]) {
     }
     else if (strcmp(argv[i], "-f") == 0) {
       i++;
-      break;
+      j = i;
     }
     i+=1;
   }
 
-  while (counter < 1) {
+  if (argv[j] == NULL) {
+    printf("\nERROR: No Se Especifico El Nombre De Archivo De Salida\n\n");
+    exit(0);
+  }
+
+  while (counter < 2) {
 
     printf("\nIntroduzca nombre del directorio: ");
     dirs = 0;
     archs = 0;
 
     j = 0;
-    while (j < 200 && counter == 0) {
+    while (j < 200) {
       act_input = getchar();
       if(act_input != '\n') {
 	input[j] = act_input;
@@ -72,14 +89,17 @@ int main (int argc, char *argv[]) {
       }
       j++;
     }
-    if (counter == 0) {
-    desDir(input,0,argv[i],b,&dirs,&archs);
+
+    if (input[j-1] != 47) {
+      input[j] = 47;
+    }
+
+    if (file_exists(argv[j]) == 1) {
+      remove(argv[j]);
+    }
+
+    desDir(input,0,argv[j],b,&dirs,&archs);
     numDir(input,archs,dirs);
     clean_array(input);
-    }
-  }
-
-  while (counter < 2) {
-    continue;
   }
 }
