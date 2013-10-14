@@ -140,9 +140,9 @@ void desDirHilo(void *arg) {
   char esDir = 0x4, *aux_dir;
   struct dirent *dir_ls;
   tipoCola *cola;
-  int i = 0, j = 0, k, result;
+  int i = 0, j = 0, k;
   pthread_t id;
-  tipoArgsHilo* auxiliar1;
+  tipoArgsHilo *auxhilo;
   tipoArgsHilo **info;
 
   info = (tipoArgsHilo**)(arg);
@@ -173,11 +173,15 @@ void desDirHilo(void *arg) {
 
     while (!estaVacio(cola)) {
       aux_dir = desencolar(cola);
-      crearVoid(&auxiliar1,aux_dir,((**info).nivel)+1,(**info).salida,(**info).numDirs,(**info).numArchs);
-      result = pthread_create(&id,NULL,desDirHilo,auxiliar1);
+      crearVoid(&auxhilo,aux_dir,((**info).nivel)+1,(**info).salida,(**info).numDirs,(**info).numArchs);
+      if (pthread_create(&id,NULL,(void*)&desDirHilo,(void*)&auxhilo) != 0) {
+	perror("\nNo se pudo crear el hilo\n");
+      }
       pthread_join(id,NULL);
+
+      free(auxhilo);
       free(aux_dir);
-      free(info);
+      free(*info);
     }
     cola_finic(&cola);
   }
