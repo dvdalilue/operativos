@@ -9,7 +9,7 @@ DEPS = funciones.h queue.h
 OBJS = funciones.o queue.o main.o
 
 arbol: $(OBJS)
-	$(CC) -ggdb $(MAIN) -o $@ 
+	$(CC) -ggdb -lpthread $(MAIN) -o $@ 
 
 %.o: %.c $(DEPS)
 	$(CC) -c $<

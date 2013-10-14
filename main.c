@@ -5,7 +5,11 @@
 #include <stdbool.h>
 #include "funciones.c"
 
+//// Declaracion de Unica variable global para las seniales /////
 int counter = 0;
+
+//// Manejador de seniales, que captura CRT-C y varia su accion /////
+//// dependiendo de cuantas veces se haya presionado /////
 
 void manejador_signal(int sig) {
   if (counter == 0) {
@@ -24,6 +28,10 @@ void manejador_signal(int sig) {
   counter++;
 }
 
+//// Funcion que verifica si un archivo existe /////
+//// en el directorio, retornando true en acierto /////
+//// false en caso de fallo /////
+
 bool file_exists(char * filename) {
 
   FILE * file;
@@ -35,6 +43,9 @@ bool file_exists(char * filename) {
   }
 }
 
+//// Funcion que vacia un arreglo de char /////
+//// sustituye todo con \0 /////
+
 void clean_array(char *input) {
   int i;
 
@@ -43,19 +54,44 @@ void clean_array(char *input) {
   }
 }
 
-void numDir(char *input, int i, int j) {
+//// Funcion que realiza impresion de los totales /////
+//// al final del recorrido de los directorios /////
+//// ya sea en el archivo y por pantalla /////
+
+void numDir(char *input, int i, int j, char *salida) {
+  FILE *fp;
+
+  fp=fopen(salida, "a");
+  fprintf(fp, "\nNumero total de archivos normales bajo %s: %d\n",input,i);
+  fprintf(fp, "Numero total de directorios bajo %s: %d\n",input,j);
+
+  fclose(fp);
+
   printf("\nNumero total de archivos normales bajo %s: %d\n",input,i);
   printf("Numero total de directorios bajo %s: %d\n",input,j);
 }
 
+//// Funcion MAIN, que captura todo desde el principio /////
+//// verificando tipo de ejecucion y archivo de salida /////
+
 int main (int argc, char *argv[]) {
+
+  /// Declaracion de variables ///
   
-  int i = 1, j, dirs, archs;
+  int i = 1, j, k = 0, dirs, archs;
   bool b = false;
   char input[200] = "";
   char act_input;
+  tipoArgsHilo *aux;
+  pthread_t pid;
+
+  /// Permite manejar la senial de CRT-C ///
 
   signal(SIGINT, &manejador_signal);
+
+  /// Reconocimiento de flags y nombre del archivo ///
+  /// de salida, ademas de casos borde que no ///
+  /// especifican bien en la ejecucion ///
 
   while (i < argc) {
     if (strcmp(argv[i], "-r") == 0) {
@@ -63,21 +99,26 @@ int main (int argc, char *argv[]) {
     }
     else if (strcmp(argv[i], "-f") == 0) {
       i++;
-      j = i;
+      k = i;
     }
     i+=1;
   }
 
-  if (argv[j] == NULL) {
+  if (argv[k] == NULL || strcmp(argv[k],"./arbol") == 0) {
     printf("\nERROR: No Se Especifico El Nombre De Archivo De Salida\n\n");
     exit(0);
   }
+
+  /// Ciclo que permite la solicitud de varios ///
+  /// directorios hasta que se hagan 2 CRT-C ///
 
   while (counter < 2) {
 
     printf("\nIntroduzca nombre del directorio: ");
     dirs = 0;
     archs = 0;
+
+    /// Captura del directorio a buscar ///
 
     j = 0;
     while (j < 200) {
@@ -90,16 +131,38 @@ int main (int argc, char *argv[]) {
       j++;
     }
 
+    /// Coloca el '/' en caso de no estar ///
+
     if (input[j-1] != 47) {
       input[j] = 47;
     }
 
-    if (file_exists(argv[j]) == 1) {
-      remove(argv[j]);
+    /// Si ya existe el archivo de salida ///
+    /// con el mismo nombre, si esta ///
+    /// lo elimina para crear uno nuevo ///
+
+    if (file_exists(argv[k]) == 1) {
+      remove(argv[k]);
     }
 
-    desDir(input,0,argv[j],b,&dirs,&archs);
-    numDir(input,archs,dirs);
-    clean_array(input);
+    /// Separa los tipos de ejecucion ///
+    /// dependiendo de lo que se haya ///
+    /// solicitado por el terminal ///
+    /// ya sea concurrente con hilos ///
+    /// o la version normal ///
+
+    if (b == false) {
+      desDir(input,0,argv[k],&dirs,&archs);
+      numDir(input,archs,dirs,argv[k]);
+      clean_array(input);
+    } else {
+      crearVoid(&aux,input,0,argv[k],&dirs,&archs);
+      if (pthread_create(&pid,NULL,(void*)&desDirHilo,(void*)&aux) != 0) {
+	perror("\nNo se pudo crear el hilo\n");
+      }
+      pthread_join(pid,NULL);  
+      numDir(input,archs,dirs,argv[k]);
+      clean_array(input);
+    }
   }
 }

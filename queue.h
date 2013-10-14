@@ -1,6 +1,9 @@
 #ifndef queue
 #define queue
 
+/// Declaracion de los tipos necesarios ///
+/// para la creacion de una cola ///
+
 typedef struct _caja {
   char* elem;
   struct _caja *siguiente;

@@ -3,6 +3,9 @@
 #include <string.h>
 #include "queue.h"
 
+/// IMPLEMENTACION DE UNA COLA ///
+/// CON SUS FUNCIONES BASICAS ///
+
 void cola_inic (tipoCola **c) {
   *c = (tipoCola *) malloc (sizeof(tipoCola));
   (**c).primero = NULL;
