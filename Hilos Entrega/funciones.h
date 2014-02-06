@@ -6,6 +6,6 @@ int drandom(int jugador, int semilla);
 void crearArchivo(int jugador,int tiradas);
 void imprimirTirada(int dados,int jugador,int numTirada);
 void imprimirTotal(int total,int jugador);
-void dados(int jugador, int tiradas, int semilla);
+int dados(int jugador, int tiradas, int semilla);
 
 #endif

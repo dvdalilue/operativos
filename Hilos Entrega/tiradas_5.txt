@@ -1,0 +1,21 @@
+Jugador: 5
+Numero de Tiradas: 18
+Tirada 1: 6
+Tirada 2: 3
+Tirada 3: 8
+Tirada 4: 9
+Tirada 5: 2
+Tirada 6: 2
+Tirada 7: 2
+Tirada 8: 12
+Tirada 9: 5
+Tirada 10: 5
+Tirada 11: 6
+Tirada 12: 5
+Tirada 13: 11
+Tirada 14: 9
+Tirada 15: 3
+Tirada 16: 4
+Tirada 17: 12
+Tirada 18: 8
+TOTAL:   112

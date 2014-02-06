@@ -68,8 +68,8 @@ void dados(int jugador, int tiradas, int semilla){
   int i = 1,j,k = 0;
   crearArchivo(jugador,tiradas);
   while (i <= tiradas) {
-    j = (drandom(jugador,semilla)%12);
-    j++;
+    j = (drandom(jugador,semilla)%11);
+    j+=2;
     k+=j;
     imprimirTirada(j,jugador,i);
     i++;

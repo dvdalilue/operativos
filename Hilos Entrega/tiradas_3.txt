@@ -1,0 +1,21 @@
+Jugador: 3
+Numero de Tiradas: 18
+Tirada 1: 2
+Tirada 2: 2
+Tirada 3: 3
+Tirada 4: 6
+Tirada 5: 9
+Tirada 6: 9
+Tirada 7: 8
+Tirada 8: 10
+Tirada 9: 5
+Tirada 10: 5
+Tirada 11: 3
+Tirada 12: 3
+Tirada 13: 12
+Tirada 14: 3
+Tirada 15: 12
+Tirada 16: 7
+Tirada 17: 8
+Tirada 18: 9
+TOTAL:   116
