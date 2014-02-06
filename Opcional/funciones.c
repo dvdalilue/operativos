@@ -1,3 +1,7 @@
+//Universidad Simon Bolivar
+//Autor: David Lilue       - Carnet: 09-10444
+//       F. Miguel Saraiva - Carnet: 09-10794
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -13,6 +17,8 @@
 #include <time.h>
 #include "queue.c"
 #include "funciones.h"
+#include "lista.c"
+#include "archivos.c"
 
 /// Funcion que inserta espacios para ///
 /// que la impresion sea la deseada ///
@@ -90,16 +96,16 @@ void desDir(char *dir, int nivel, char *salida, int *dirs, int *archs) {
     cola_inic(&cola);
     while ((dir_ls = readdir(aux)) != NULL) {
       if ((*dir_ls).d_type == esDir) {
-        if (strcmp((*dir_ls).d_name,".") != 0 && strcmp((*dir_ls).d_name,"..") != 0) {
-          aux_dir = (char *) malloc (sizeof(dir)+200);
-          strcpy(aux_dir,dir);
-          strcat(aux_dir,(*dir_ls).d_name);
-          strcat(aux_dir,"/");
-          encolar(cola,aux_dir);
-          j++;
-        } 
+	if (strcmp((*dir_ls).d_name,".") != 0 && strcmp((*dir_ls).d_name,"..") != 0) {
+	  aux_dir = (char *) malloc (sizeof(dir)+200);
+	  strcpy(aux_dir,dir);
+	  strcat(aux_dir,(*dir_ls).d_name);
+	  strcat(aux_dir,"/");
+	  encolar(cola,aux_dir);
+	  j++;
+	} 
       } else {
-        i++;
+	i++;
       }
     }
     closedir(aux);
@@ -118,70 +124,89 @@ void desDir(char *dir, int nivel, char *salida, int *dirs, int *archs) {
   }
 }
 
-/// Funcion que inicializa estructura para ///
-/// la version de hilos, necesaria para la ///
-/// creacion de los mismos ///
-
-void crearVoid(tipoArgsHilo **aux, char *dir, int nivel, char *salida, int *dirs, int *archs) {
-  *aux = (tipoArgsHilo *) malloc (sizeof(tipoArgsHilo));
-  (**aux).dir = dir;
-  (**aux).nivel = nivel;
-  (**aux).salida = salida;
-  (**aux).numDirs = dirs;
-  (**aux).numArchs = archs;
-}
 
 /// Funcion principal para el recorrido de ///
 /// los directorios para la version de hilos ///
 
-void desDirHilo(void *arg) {
+void* crearVoid (char *dir, int nivel, char *salida, bool b, int *dirs, int *archs) {
+  tipoArgsHilo *aux;
 
+  aux = malloc(sizeof(tipoArgsHilo));
+  aux->dir = dir;
+  aux->nivel = nivel;
+  aux->salida = salida;
+  aux->b = b;
+  aux->numDirs = dirs;
+  aux->numArchs = archs;
+  return ((void*)(aux));
+}
+
+/// Funcion que inicializa estructura para ///
+/// la version de hilos, necesaria para la ///
+/// creacion de los mismos ///
+
+void* desDirHilo(void *arg) {
   DIR *aux;
   char esDir = 0x4, *aux_dir;
   struct dirent *dir_ls;
   tipoCola *cola;
-  int i = 0, j = 0, k;
+  int i = 0, j = 0, k, result;
   pthread_t id;
-  tipoArgsHilo *auxhilo;
-  tipoArgsHilo **info;
-
-  info = (tipoArgsHilo**)(arg);
-  aux = opendir((**info).dir);
-
+  void* auxiliar1;
+  tipoArgsHilo* info;
+  char nombre[25];
+  listaCabeza *cabeza;
+  tipoLista *auxiliar2;
+  
+  info = (tipoArgsHilo*)(arg);
+  aux = opendir(info->dir);
   if (aux == NULL) {
     perror("*No puedo abrir el directorio!!");
   } else {
     cola_inic(&cola);
     while ((dir_ls = readdir(aux)) != NULL) {
       if ((*dir_ls).d_type == esDir) {
-        if (strcmp((*dir_ls).d_name,".") != 0 && strcmp((*dir_ls).d_name,"..") != 0) {
-          aux_dir = (char *) malloc (sizeof((**info).dir)+200);
-          strcpy(aux_dir,(**info).dir);
-          strcat(aux_dir,(*dir_ls).d_name);
-          strcat(aux_dir,"/");
-          encolar(cola,aux_dir);
-          j++;
-        }
+	if (strcmp((*dir_ls).d_name,".") != 0 && strcmp((*dir_ls).d_name,"..") != 0) {
+	  aux_dir = (char *) malloc (sizeof(info->dir)+200);
+	  strcpy(aux_dir,info->dir);
+	  strcat(aux_dir,(*dir_ls).d_name);
+	  strcat(aux_dir,"/");
+	  encolar(cola,aux_dir);
+	  j++;
+	}
       } else {
-        i++;
+	i++;
       }
     }
     closedir(aux);
-    impDir((**info).dir,i,j,(**info).nivel,(**info).salida);
-    (*(**info).numDirs) = (*(**info).numDirs) + j;
-    (*(**info).numArchs) = (*(**info).numArchs) + i;
-
+    impDir(info->dir,i,j,info->nivel,info->salida);
+    imprimirArchivo(info->dir,i,j,info->nivel,info->salida);
+    
+    *info->numDirs = *info->numDirs + j;
+    *info->numArchs = *info->numArchs + i;
+    
+    i = 0;
+    cabeza = crearCabeza();
     while (!estaVacio(cola)) {
       aux_dir = desencolar(cola);
-      crearVoid(&auxhilo,aux_dir,((**info).nivel)+1,(**info).salida,(**info).numDirs,(**info).numArchs);
-      if (pthread_create(&id,NULL,(void*)&desDirHilo,(void*)&auxhilo) != 0) {
-        perror("\nNo se pudo crear el hilo\n");
+      auxiliar1 = (crearVoid(aux_dir,(info->nivel)+1,info->salida,info->b,info->numDirs,info->numArchs));
+      result = pthread_create(&id,NULL,desDirHilo,auxiliar1);
+      if (result != 0) {
+        perror("\nNO SE CREO EL HILO\n");
+	exit(1);
       }
-      pthread_join(id,NULL);
-
+      agregarLista(cabeza,id);
+      i++;
       free(aux_dir);
     }
     cola_finic(&cola);
+    while (listaVacio(cabeza) == 0){ 
+      auxiliar2 = obtenerLista(cabeza);
+      pthread_join(auxiliar2->elem);
+      leerArchivo(auxiliar2->elem,0);
+      remove(auxiliar2->elem);
+      free(auxiliar2);
+    }
   }
-  pthread_exit(0);
+ pthread_exit(0);
 }
